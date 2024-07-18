@@ -1,3 +1,4 @@
+/* App.css */
 .App {
   text-align: center;
 }
@@ -21,7 +22,7 @@
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: rgba(236, 29, 29, 0.466);
 }
 
 .App-link {
@@ -33,6 +34,15 @@
     transform: rotate(0deg);
   }
   to {
-    transform: rotate(360deg);
+    transform: rotate(1000deg);
   }
+}
+
+/* Ensure this part is commented out or removed if you're using anime.js for animations */
+.animated-element {
+  width: 100px;
+  height: 100px;
+  background-color: rgba(255, 0, 0, 0.37);
+  /* animation-name: example; */
+  /* animation-duration: 4s; */
 }
