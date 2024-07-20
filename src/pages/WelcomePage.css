@@ -1,6 +1,72 @@
 /* src/pages/WelcomePage.css */
 .welcome-page {
-    text-align: center;
-    padding: 20px;
-  }
-  
+  text-align: center;
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(45deg, #5a78b181, #417a50b2); /* Example gradient */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden; /* Ensure content stays within the viewport */
+}
+
+.welcome-page h1 {
+  color: #d586d18d; /* Light text color for contrast */
+}
+
+.button {
+  background-color: #2980b9;
+  color: #ecf0f1;
+  padding: 10px 20px;
+  margin: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1.6vw; /* Adjusted to scale with the viewport */
+}
+
+.button:hover {
+  background-color: #3498db;
+}
+
+.categories {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 1vw;
+  width: 80vw;
+  max-width: 800px;
+  margin-top: 20px;
+  box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+}
+
+.category-button {
+  background-color: #2980b9;
+  color: #ecf0f1;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 20vw; /* Width relative to viewport */
+  height: 20vw; /* Height relative to viewport */
+  max-width: 150px; /* Max width for better responsiveness */
+  max-height: 150px; /* Max height for better responsiveness */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2vw; /* Font size relative to viewport */
+  position: relative;
+}
+
+.category-button span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 80%;
+}
+
+.category-button:hover {
+  background-color: #3498db;
+}

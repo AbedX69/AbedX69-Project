@@ -1,8 +1,8 @@
+
 /* src/pages/ProfilePage.css */
 .profile-page {
-    padding: 20px;
-  }
-  
+  padding: 80px 20px 20px; /* Add padding at the top */
+}
   .profile-section {
     background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent background for sections */
     padding: 10px;

@@ -1,8 +1,8 @@
+
 /* src/pages/ShoppingPage.css */
 .shopping-page {
-    padding: 20px;
-  }
-  
+  padding: 80px 20px 20px; /* Add padding at the top */
+}
   .shopping-items {
     background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent background for items */
     padding: 10px;

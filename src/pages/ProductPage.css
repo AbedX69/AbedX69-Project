@@ -1,8 +1,8 @@
 /* src/pages/ProductPage.css */
+/* src/pages/ProductPage.css */
 .product-page {
-    padding: 20px;
-  }
-  
+  padding: 80px 20px 20px; /* Add padding at the top */
+}
   .product-details {
     background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent background for details */
     padding: 10px;
