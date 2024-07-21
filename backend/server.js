@@ -1,12 +1,11 @@
-// backend/server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
-const User = require('./models/User');
-const authMiddleware = require('./authMiddleware');
+const User = require('./models/User'); // Ensure the path is correct
+const authMiddleware = require('./authMiddleware'); // Ensure the path is correct
 
 const app = express();
 const port = 5000;
@@ -82,6 +81,24 @@ app.get('/api/profile', authMiddleware, async (req, res) => {
     res.json(user);
   } catch (error) {
     console.error('Error fetching user profile:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Profile update route
+app.put('/api/profile', authMiddleware, async (req, res) => {
+  try {
+    const { firstName, lastName, email } = req.body;
+    console.log('Update request data:', req.body);
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { firstName, lastName, email },
+      { new: true }
+    ).select('-password');
+    console.log('Updated user:', updatedUser);
+    res.json(updatedUser);
+  } catch (error) {
+    console.error('Error updating user profile:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
