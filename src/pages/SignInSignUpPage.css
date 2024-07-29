@@ -6,7 +6,7 @@
 
 .forms-container {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
 }
 
 .signup-form, .signin-form {
@@ -37,4 +37,9 @@ button {
 
 button:hover {
   background-color: #3498db;
+}
+
+.error-message {
+  color: red;
+  margin: 10px 0;
 }

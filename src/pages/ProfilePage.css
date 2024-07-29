@@ -1,11 +1,36 @@
-
 /* src/pages/ProfilePage.css */
 .profile-page {
-  padding: 80px 20px 20px; /* Add padding at the top */
+  padding: 20px;
 }
-  .profile-section {
-    background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent background for sections */
-    padding: 10px;
-    border-radius: 5px;
-  }
-  
+
+.profile-details {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile-content {
+  display: flex;
+  justify-content: space-around;
+}
+
+.purchases, .sales {
+  width: 45%;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.add-product-button {
+  background-color: #2980b9;
+  color: #ecf0f1;
+  padding: 10px;
+  margin: 10px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 24px;
+}
+
+.add-product-button:hover {
+  background-color: #3498db;
+}

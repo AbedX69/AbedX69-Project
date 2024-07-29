@@ -1,11 +1,15 @@
+// backend/server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
-const User = require('./models/User'); // Ensure the path is correct
-const authMiddleware = require('./authMiddleware'); // Ensure the path is correct
+const multer = require('multer');
+const User = require('./models/User');
+const Product = require('./models/Product');
+const Counter = require('./models/Counter');
+const authMiddleware = require('./authMiddleware');
 
 const app = express();
 const port = 5000;
@@ -13,6 +17,9 @@ const jwtSecret = 'your_jwt_secret_key';
 
 app.use(bodyParser.json());
 app.use(cors());
+
+// Serve static files from the "uploads" directory
+app.use('/uploads', express.static('uploads'));
 
 mongoose.connect('mongodb://127.0.0.1:27017/mydb', {
   useNewUrlParser: true,
@@ -27,78 +34,60 @@ db.once('open', () => {
   console.log('Connected to MongoDB');
 });
 
-// Sign up route
-app.post('/api/signup', async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
-  console.log('Received signup request:', req.body);
+// Configure Multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  }
+});
+const upload = multer({ storage });
 
+// Other routes...
+
+// Add New Product route
+app.post('/api/products', authMiddleware, upload.array('images', 5), async (req, res) => {
   try {
-    if (!firstName || !lastName || !email || !password) {
-      throw new Error('All fields are required');
-    }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ firstName, lastName, email, password: hashedPassword });
-    await user.save();
-    console.log('User created:', user);
-    res.status(201).json({ message: 'User created successfully' });
+    const { name, description, price, category } = req.body;
+    const images = req.files.map(file => file.path);
+
+    const counter = await Counter.findByIdAndUpdate(
+      { _id: 'productId' },
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+
+    const productId = counter.seq;
+
+    const product = new Product({
+      productId,
+      name,
+      description,
+      price,
+      category,
+      images
+    });
+    await product.save();
+
+    res.status(201).json({ message: 'Product added successfully', productId: product.productId });
   } catch (error) {
-    console.error('Error creating user:', error.message);
+    console.error('Error adding product:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Sign in route
-app.post('/api/signin', async (req, res) => {
-  const { email, password } = req.body;
-  console.log('Received signin request:', req.body);
-
+// Fetch Product Details route
+app.get('/api/products/:id', async (req, res) => {
   try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      console.log('Invalid credentials: User not found');
-      return res.status(400).json({ error: 'Invalid credentials' });
+    const product = await Product.findOne({ productId: req.params.id });
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
     }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      console.log('Invalid credentials: Password mismatch');
-      return res.status(400).json({ error: 'Invalid credentials' });
-    }
-
-    const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '1h' });
-    console.log('User signed in:', user);
-    res.json({ token });
+    res.json(product);
   } catch (error) {
-    console.error('Error signing in:', error.message);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Profile route
-app.get('/api/profile', authMiddleware, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).select('-password');
-    res.json(user);
-  } catch (error) {
-    console.error('Error fetching user profile:', error.message);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Profile update route
-app.put('/api/profile', authMiddleware, async (req, res) => {
-  try {
-    const { firstName, lastName, email } = req.body;
-    console.log('Update request data:', req.body);
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user.id,
-      { firstName, lastName, email },
-      { new: true }
-    ).select('-password');
-    console.log('Updated user:', updatedUser);
-    res.json(updatedUser);
-  } catch (error) {
-    console.error('Error updating user profile:', error.message);
+    console.error('Error fetching product details:', error.message);
     res.status(500).json({ error: error.message });
   }
 });
