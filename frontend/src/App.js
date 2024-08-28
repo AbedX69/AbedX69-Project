@@ -1,5 +1,5 @@
-// src/App.js
-import React from 'react';
+// frontend/src/App.js
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import WelcomePage from './pages/WelcomePage';
 import ProfilePage from './pages/ProfilePage';
@@ -9,16 +9,22 @@ import SignInSignUpPage from './pages/SignInSignUpPage';
 import Header from './components/Header';
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  const handleUserAuthenticated = (userInfo) => {
+    setUser(userInfo);
+  };
+
   return (
     <Router>
       <div className="App">
-        <Header />
+        <Header isSignedIn={!!user} userName={user ? `${user.firstName} ${user.lastName}` : ''} />
         <Routes>
           <Route path="/" element={<WelcomePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/new-product" element={<NewProductPage />} />
           <Route path="/product/:productId" element={<ProductPage />} />
-          <Route path="/signin-signup" element={<SignInSignUpPage />} />
+          <Route path="/signin-signup" element={<SignInSignUpPage onUserAuthenticated={handleUserAuthenticated} />} />
         </Routes>
       </div>
     </Router>

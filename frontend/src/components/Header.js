@@ -1,16 +1,15 @@
-// src/components/Header.js
+// frontend/src/components/Header.js
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './Header.css';
 
-function Header({ isSignedIn, userName, userProfilePicture }) {
+function Header({ isSignedIn, userName }) {
   return (
     <div className="header">
       <div className="header-left">
         {isSignedIn ? (
           <div className="profile-info">
-            <img src={userProfilePicture} alt="Profile" className="profile-picture" />
-            <span>{userName}</span>
+            <span>Welcome, {userName}</span>
           </div>
         ) : (
           <Link to="/signin-signup">

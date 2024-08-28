@@ -1,4 +1,3 @@
-// backend/server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -10,6 +9,7 @@ const User = require('./models/User');
 const Product = require('./models/Product');
 const Counter = require('./models/Counter');
 const authMiddleware = require('./authMiddleware');
+const userRoutes = require('./routes/userRoutes'); // Import the routes
 
 const app = express();
 const port = 5000;
@@ -17,9 +17,6 @@ const jwtSecret = 'your_jwt_secret_key';
 
 app.use(bodyParser.json());
 app.use(cors());
-
-// Serve static files from the "uploads" directory
-app.use('/uploads', express.static('uploads'));
 
 mongoose.connect('mongodb://127.0.0.1:27017/mydb', {
   useNewUrlParser: true,
@@ -34,6 +31,9 @@ db.once('open', () => {
   console.log('Connected to MongoDB');
 });
 
+// Use the user routes
+app.use('/api', userRoutes);
+
 // Configure Multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -43,9 +43,18 @@ const storage = multer.diskStorage({
     cb(null, `${Date.now()}-${file.originalname}`);
   }
 });
-const upload = multer({ storage });
-
-// Other routes...
+const upload = multer({ 
+  storage,
+  fileFilter: (req, file, cb) => {
+    const filetypes = /jpeg|jpg|png|gif/;
+    const mimetype = filetypes.test(file.mimetype);
+    const extname = filetypes.test(file.originalname.split('.').pop());
+    if (mimetype && extname) {
+      return cb(null, true);
+    }
+    cb(new Error('File upload only supports the following filetypes - ' + filetypes));
+  }
+});
 
 // Add New Product route
 app.post('/api/products', authMiddleware, upload.array('images', 5), async (req, res) => {

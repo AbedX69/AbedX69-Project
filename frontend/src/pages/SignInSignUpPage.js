@@ -1,10 +1,11 @@
-// src/pages/SignInSignUpPage.js
+// File path: C:\Users\AbedX69\Documents\GitHub\AbedX69-Project\frontend\src\pages\SignInSignUpPage.js
+
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './SignInSignUpPage.css';
 
-const SignInSignUpPage = () => {
+const SignInSignUpPage = ({ onUserAuthenticated }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -29,13 +30,15 @@ const SignInSignUpPage = () => {
       const url = isSignUp ? 'http://localhost:5000/api/signup' : 'http://localhost:5000/api/signin';
       const response = await axios.post(url, formData);
       console.log('Response:', response.data);
-      // Handle successful response
+
       if (!isSignUp) {
-        localStorage.setItem('token', response.data.token); // Save token for authenticated requests
+        localStorage.setItem('token', response.data.token);
+        onUserAuthenticated(response.data.user);
         navigate('/profile'); // Redirect to profile page
       } else {
-        alert('Sign up successful! Please sign in.');
-        setIsSignUp(false);
+        alert('Sign up successful! Redirecting...');
+        onUserAuthenticated({ firstName: formData.firstName, lastName: formData.lastName });
+        navigate('/profile'); // Redirect to profile page
       }
     } catch (error) {
       console.error('Error:', error.response ? error.response.data : error.message);
@@ -48,7 +51,7 @@ const SignInSignUpPage = () => {
       <h2>{isSignUp ? 'Sign Up' : 'Sign In'}</h2>
       {error && <p className="error-message">{error}</p>}
       <div className="forms-container">
-        <form onSubmit={handleSubmit} className={isSignUp ? "signup-form" : "signin-form"}>
+        <form onSubmit={handleSubmit} className={isSignUp ? 'signup-form' : 'signin-form'}>
           {isSignUp && (
             <>
               <input

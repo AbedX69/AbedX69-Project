@@ -1,76 +1,84 @@
-// src/pages/NewProductPage.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const NewProductPage = () => {
-  const [productData, setProductData] = useState({
+  const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
     category: '',
+    images: [],
   });
-  const [images, setImages] = useState([]);
+  const [error, setError] = useState('');
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setProductData({
-      ...productData,
+    setFormData({
+      ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
   const handleFileChange = (e) => {
-    setImages(e.target.files);
+    setFormData({
+      ...formData,
+      images: e.target.files,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    for (const key in productData) {
-      formData.append(key, productData[key]);
+    const data = new FormData();
+    data.append('name', formData.name);
+    data.append('description', formData.description);
+    data.append('price', formData.price);
+    data.append('category', formData.category);
+    for (let i = 0; i < formData.images.length; i++) {
+      data.append('images', formData.images[i]);
     }
-    for (const image of images) {
-      formData.append('images', image);
-    }
+
     try {
-      const response = await axios.post('http://localhost:5000/api/products', formData, {
+      const response = await axios.post('http://localhost:5000/api/products', data, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
-      console.log('Product added:', response.data);
+      console.log('Response:', response.data);
       navigate(`/product/${response.data.productId}`);
     } catch (error) {
-      console.error('Error adding product:', error);
+      console.error('Error:', error.response ? error.response.data : error.message);
+      setError(error.response ? error.response.data.error : 'An error occurred. Please try again.');
     }
   };
 
   return (
     <div className="new-product-page">
-      <h1>Add New Product</h1>
+      <h2>Add New Product</h2>
+      {error && <p className="error-message">{error}</p>}
       <form onSubmit={handleSubmit}>
         <input
           type="text"
           name="name"
           placeholder="Product Name"
-          value={productData.name}
+          value={formData.name}
           onChange={handleChange}
           required
         />
         <textarea
           name="description"
-          placeholder="Product Description"
-          value={productData.description}
+          placeholder="Description"
+          value={formData.description}
           onChange={handleChange}
           required
-        ></textarea>
+        />
         <input
           type="number"
           name="price"
           placeholder="Price"
-          value={productData.price}
+          value={formData.price}
           onChange={handleChange}
           required
         />
@@ -78,16 +86,16 @@ const NewProductPage = () => {
           type="text"
           name="category"
           placeholder="Category"
-          value={productData.category}
+          value={formData.category}
           onChange={handleChange}
           required
         />
         <input
           type="file"
           name="images"
-          accept="image/png, image/jpeg, image/jpg, image/webp"
-          multiple
+          accept=".jpeg,.jpg,.png,.gif"
           onChange={handleFileChange}
+          multiple
           required
         />
         <button type="submit">Add Product</button>
